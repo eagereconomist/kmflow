@@ -1,17 +1,23 @@
-import sys
 from pathlib import Path
+
 import typer
+from typing import Optional
 from tqdm import tqdm
+
 from kmflow.utils import cli_utils, process_utils, pca_utils
 
-app = typer.Typer()
+app = typer.Typer(
+    help="PCA: compute loadings, scores, and variance summaries, writing CSVs to a directory."
+)
 
 
 @app.command("pca")
 def run_pca(
-    input_file: Path = typer.Argument(
-        ...,
-        help="CSV file to read (use '-' for stdin).",
+    input_path: Optional[Path] = typer.Option(
+        None,
+        "--input",
+        "-i",
+        help="CSV path. If omitted, data is read from stdin.",
     ),
     numeric_cols: str = typer.Option(
         "",
@@ -31,28 +37,27 @@ def run_pca(
         "-seed",
         help="Random seed for reproducibility.",
     ),
-    output_dir: Path = typer.Option(
+    output_dir: Path | None = typer.Option(
         None,
         "--output-dir",
         "-o",
         dir_okay=True,
         file_okay=False,
-        help="Directory where PCA summary CSVs will be saved.",
+        help="Directory where PCA summary CSVs will be saved. Defaults to ./<stem>_pca",
     ),
 ):
     """
     Compute PCA loadings, scores, explained variance, and cumulative variance,
-    then write four CSVs with a progress bar.
+    then write four CSVs into a directory (created if needed).
     """
-    df = cli_utils.read_df(input_file)
-    stem = input_file.stem if input_file != Path("-") else "stdin"
+    # 1) Read input
+    df = cli_utils.read_df(input_path)
+    stem = input_path.stem if input_path is not None else "stdout"
 
-    # ─── parse numeric_cols into a list or None ────────────────────
-    if numeric_cols.strip() == "":
-        numeric_cols_arg = None
-    else:
-        numeric_cols_arg = cli_utils.comma_split(numeric_cols)
+    # 2) Parse numeric_cols → list[str] | None
+    numeric_cols_arg = None if not numeric_cols.strip() else cli_utils.comma_split(numeric_cols)
 
+    # 3) Compute PCA
     summary = pca_utils.compute_pca(
         df=df,
         numeric_cols=numeric_cols_arg,
@@ -60,11 +65,11 @@ def run_pca(
         random_state=random_state,
     )
 
-    if output_dir is None:
-        output_dir = Path(f"{stem}_pca")
-    if output_dir != Path("-"):
-        output_dir.mkdir(parents=True, exist_ok=True)
+    # 4) Decide and create output directory
+    outdir = output_dir or (Path.cwd() / f"{stem}_pca")
+    outdir.mkdir(parents=True, exist_ok=True)
 
+    # 5) Prepare outputs
     tasks = [
         (
             "PCA Loadings",
@@ -88,12 +93,11 @@ def run_pca(
         ),
     ]
 
+    # 6) Write files with a progress bar
     for desc, df_out, suffix in tqdm(tasks, desc="Writing PCA CSVs", colour="green"):
-        if output_dir == Path("-"):
-            df_out.to_csv(sys.stdout.buffer, index=False)
-            typer.secho(f"{desc} written to stdout.", fg="green")
-        else:
-            path = process_utils.write_csv(
-                df_out, prefix=stem, suffix=suffix, output_dir=output_dir
-            )
-            typer.secho(f"Saved {desc} -> {path!r}", fg="green")
+        path = process_utils.write_csv(df_out, prefix=stem, suffix=suffix, output_dir=outdir)
+        typer.secho(f"Saved {desc} -> {path!r}", fg="green")
+
+
+if __name__ == "__main__":
+    app()
