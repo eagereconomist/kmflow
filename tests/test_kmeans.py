@@ -1,4 +1,3 @@
-import io
 import unittest
 import pandas as pd
 from typer.testing import CliRunner
