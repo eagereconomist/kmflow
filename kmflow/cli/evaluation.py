@@ -98,7 +98,7 @@ def inertia(
         init=init,
     )
 
-    # 3) stdout
+    # 3) write
     cli_utils.write_df(inertia_df)
     logger.success("Inertia table written to stdout.")
 
@@ -146,7 +146,7 @@ def silhouette(
         init=init,
     )
 
-    # stdout
+    # write
     cli_utils.write_df(silhouette_df)
     logger.success("Silhouette table written to stdout.")
 
@@ -194,7 +194,7 @@ def calinski(
         init=init,
     )
 
-    # stdout
+    # write
     cli_utils.write_df(calinski_df)
     logger.success("Calinski-Harabasz table written to stdout.")
 
@@ -240,7 +240,7 @@ def davies(
         init=init,
     )
 
-    # stdout
+    # write
     cli_utils.write_df(davies_df)
     logger.success("Davies-Bouldin table written to stdout.")
 

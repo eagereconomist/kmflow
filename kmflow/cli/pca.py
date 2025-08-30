@@ -54,7 +54,7 @@ def run_pca(
     df = cli_utils.read_df(input_path)
     stem = input_path.stem if input_path is not None else "stdout"
 
-    # 2) Parse numeric_cols → list[str] | None
+    # 2) Parse numeric_cols -> list[str] | None
     numeric_cols_arg = None if not numeric_cols.strip() else cli_utils.comma_split(numeric_cols)
 
     # 3) Compute PCA

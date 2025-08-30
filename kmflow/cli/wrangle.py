@@ -50,10 +50,10 @@ def iqr_outliers(
         raise typer.BadParameter("No output selected. Use --export-outliers or --remove-outliers.")
 
     with tqdm(total=2, desc="IQR Outliers", colour="green") as pbar:
-        df = cli_utils.read_df(source)  # load
+        df = cli_utils.read_df(source)
         pbar.update(1)
 
-        out = wrangle_utils.find_iqr_outliers(df)  # detect
+        out = wrangle_utils.find_iqr_outliers(df)
         pbar.update(1)
 
     if out.empty:
@@ -124,7 +124,7 @@ def preprocess(
         df = func(df, *args)
 
     if preview:
-        typer.echo(df.head(), err=True)  # keep stdout clean
+        typer.echo(df.head(), err=True)
 
     cli_utils.write_df(df)
     logger.success("Preprocessed CSV written to stdout.")

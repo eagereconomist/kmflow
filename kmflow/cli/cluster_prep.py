@@ -90,7 +90,7 @@ def map_clusters(
     typer.echo("\nCounts per label:")
     typer.echo(counts.to_markdown(index=False))
 
-    # 4) write to stdout
+    # 4) write
     cli_utils.write_df(counts)
     logger.success("Label counts written to stdout.")
 

@@ -144,7 +144,7 @@ def boxplot(
     )
     default_name = f"{name_mid}_{numeric_col}_boxplot.png"
 
-    # normalize patterns from ["'a, b'"] → ["a", "b"] if provided once
+    # normalize patterns from ["'a, b'"] -> ["a", "b"] if provided once
     patt = patterns[0].split(", ") if (patterns and len(patterns) == 1) else patterns
 
     with tqdm(total=2, desc="Boxplot", colour="green") as pbar:
@@ -505,7 +505,6 @@ def cluster3d(
         )
         pbar.update(1)
 
-        # annotate/tune if desired (kept simple)
         if save:
             logger.success(f"3D cluster scatter saved to {out_path!r}")
         else:
