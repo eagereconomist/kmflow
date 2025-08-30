@@ -183,7 +183,7 @@ cat data/processed/processed_data.csv \
     --no-save
 ```
 
-- Create and write histogram to disk:
+- Create and write a histogram to a predetermined destination:
   
 ```bash
 cat data/processed/processed_data.csv \
@@ -260,7 +260,7 @@ cat data/processed/processed_data.csv \
       > clustered_8.csv
   ```
 
-  - Running and writing k-means to disk on a processed dataset, using 8 clusters and a seed, with the algorithm set to `elkan`, initialization method as `random`, and number of initializations (`--n-init`) set to 100 iterations:
+  - Running and writing k-means to a predetermined destination on a processed dataset, using 8 clusters and a seed, with the algorithm set to `elkan`, initialization method as `random`, and number of initializations (`--n-init`) set to 100 iterations:
   
   ```bash
   cat data/processed/std_outliers/std.csv \
