@@ -56,8 +56,14 @@ def write_df(df: pd.DataFrame) -> None:
 
 
 def comma_split(value: str) -> list[str]:
+    """
+    Split a comma-separated string nito a list of strings.
+    """
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def comma_split_int(value: str) -> list[int]:
+    """
+    Split a comma-separated string into a list of integers.
+    """
     return [int(item.strip()) for item in value.split(",") if item.strip()]
