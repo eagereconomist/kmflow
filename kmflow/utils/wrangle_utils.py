@@ -2,6 +2,7 @@ import pandas as pd
 
 
 def find_iqr_outliers(df: pd.DataFrame) -> pd.Series:
+    """Detect outliers in numeric columns using the IQR method; returns a stacked Series of outliers."""
     num_df = df.select_dtypes(include="number")
     q1 = num_df.quantile(0.25)
     q3 = num_df.quantile(0.75)
@@ -14,13 +15,16 @@ def find_iqr_outliers(df: pd.DataFrame) -> pd.Series:
 
 
 def drop_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
+    """Return a copy of the DataFrame with the specified column(s) removed."""
     return df.drop(columns=[col])
 
 
 def drop_row(df: pd.DataFrame, index_list: list[int]) -> pd.DataFrame:
+    """Return a copy of the DataFrame with specified row(s) (by index) dropped and index reset."""
     return df.drop(index=index_list).reset_index(drop=True)
 
 
 def dotless_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
+    """Rename the specified column header by removing all periods from its name."""
     new_col = col.replace(".", "")
     return df.rename(columns={col: new_col})
