@@ -46,13 +46,14 @@ sns.set_theme(
 
 
 def _init_fig(figsize=(20, 14)):
-    """Create a fig + ax with shared cubehelix palette."""
+    """Create and return a (fig, ax) with cubehelix styling applied."""
     _apply_cubehelix_style()
     fig, ax = plt.subplots(figsize=figsize)
     return fig, ax
 
 
 def _apply_cubehelix_style():
+    """Set a cubehelix color cycle on Matplotlib axes."""
     palette = sns.cubehelix_palette(
         n_colors=8, start=3, rot=1, reverse=True, light=0.7, dark=0.1, gamma=0.4
     )
@@ -60,6 +61,7 @@ def _apply_cubehelix_style():
 
 
 def _set_axis_bounds(ax, vals: pd.Series, axis: str = "x"):
+    """Expand axis limits from 0 to max(vals) + 1 on the chosen axis ('x' or 'y')."""
     lower, higher = 0, vals.max() + 1
     if axis == "x":
         ax.set_xlim(lower, higher)
@@ -115,15 +117,10 @@ def _ensure_unique_path(path: Path) -> Path:
 
 
 def _save_fig(fig: plt.Figure, path: Path):
-    """Ensure directory exists, save and close."""
+    """Create parent dirs, save the figure to disk, and close it."""
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path)
     plt.close(fig)
-
-
-# ─────────────────────────────────────────
-# Basic plots (matplotlib / seaborn)
-# ─────────────────────────────────────────
 
 
 def bar_plot(
@@ -135,6 +132,7 @@ def bar_plot(
     save: bool = True,
     ax: Optional[plt.Axes] = None,
 ) -> pd.DataFrame:
+    """Bar chart of numeric_col by category_col (vertical by default)."""
     for col in (category_col, numeric_col):
         if col not in df.columns:
             raise ValueError(f"Column '{col}' not found in DataFrame.")
@@ -174,6 +172,7 @@ def histogram(
     save: bool = True,
     ax: Optional[plt.Axes] = None,
 ) -> pd.DataFrame:
+    """Histogram of x_axis with num_bins bins."""
     if x_axis not in df.columns:
         raise ValueError(f"Column '{x_axis}' not in DataFrame.")
     if ax is None:
@@ -202,6 +201,7 @@ def scatter_plot(
     save: bool = True,
     ax: Optional[plt.Axes] = None,
 ) -> pd.DataFrame:
+    """2D scatterplot of y_axis vs x_axis; optional axis scaling around the center."""
     missing = [col for col in (x_axis, y_axis) if col not in df.columns]
     if missing:
         raise ValueError(f"Columns {missing} not in DataFrame.")
@@ -382,6 +382,7 @@ def correlation_heatmap(
     save: bool = True,
     ax: Optional[plt.Axes] = None,
 ) -> pd.DataFrame:
+    """Pearson correlation heatmap for all numeric columns."""
     numeric_df = df.select_dtypes(include="number")
     if numeric_df.empty:
         raise ValueError("No numeric columns found for correlation heatmap.")
@@ -421,6 +422,7 @@ def qq_plot(
     save: bool = True,
     ax: Optional[plt.Axes] = None,
 ) -> plt.Axes:
+    """Q-Q plot of numeric_col against a regression line."""
     if numeric_col not in df.columns:
         raise ValueError(f"numeric_col {numeric_col!r} not found")
 
@@ -442,6 +444,7 @@ def qq_plot(
 def inertia_plot(
     inertia_df: pd.DataFrame, output_path: Optional[Path] = None, save: bool = True
 ) -> plt.Figure:
+    """Line plot of KMeans inertia vs. number of clusters (k)."""
     fig, ax = _init_fig()
     ax.plot(inertia_df["k"], inertia_df["inertia"], marker="o")
     ax.set_xlabel("Number of Clusters (k)")
@@ -457,6 +460,7 @@ def inertia_plot(
 def silhouette_plot(
     silhouette_df: pd.DataFrame, output_path: Optional[Path] = None, save: bool = True
 ) -> plt.Figure:
+    """Line plot of silhouette score vs. number of clusters (k)."""
     fig, ax = _init_fig()
     ax.plot(silhouette_df["n_clusters"], silhouette_df["silhouette_score"], marker="o")
     ax.set_xlabel("Number of Clusters (k)")
@@ -474,6 +478,7 @@ def scree_plot(
     output_path: Optional[Path] = None,
     save: bool = True,
 ) -> plt.Figure:
+    """Scree plot of per-component explained variance (prop_var)."""
     fig, ax = _init_fig()
     x = range(1, len(df["prop_var"]) + 1)
     y = df["prop_var"].values
@@ -492,6 +497,7 @@ def cumulative_var_plot(
     output_path: Optional[Path] = None,
     save: bool = True,
 ) -> plt.Figure:
+    """Cumulative variance explained plot (cumulative_prop_var) across PCs."""
     fig, ax = _init_fig()
     x = range(1, len(df["cumulative_prop_var"]) + 1)
     y = df["cumulative_prop_var"].values
@@ -514,6 +520,7 @@ def cluster_scatter(
     save: bool = True,
     ax: Optional[plt.Axes] = None,
 ) -> plt.Axes:
+    """2D scatterplot colored/styled by cluster_col; cluster labels start at 1."""
     df_plot = df.copy()
     df_plot[cluster_col] = df_plot[cluster_col].astype(int)
     df_plot[cluster_col] = (df_plot[cluster_col] + 1).astype(str)
@@ -567,6 +574,7 @@ def cluster_scatter_3d(
     scale: float = 1.0,
     save: bool = True,
 ) -> px.scatter_3d:
+    """Interactive 3D scatter over three numeric_cols, colored by cluster_col."""
     if len(numeric_cols) != 3:
         raise ValueError(
             "Need exactly three numeric features for 3D plotting; e.g. 'weight' 'height' 'width'"
@@ -701,6 +709,8 @@ def biplot(
     save: bool = True,
     output_path: Optional[Path] = None,
 ) -> plt.Figure:
+    """2D Biplot of PC scores with loading vectors; optional cluster
+    hue and PC labels via pve."""
     # 1) figure out feature columns
     if pd.api.types.is_integer_dtype(loadings.columns):
         feature_cols = df.select_dtypes(include="number").columns.tolist()
@@ -788,6 +798,7 @@ def biplot_3d(
     hue: Optional[pd.Series] = None,
     save: bool = True,
 ) -> go.Figure:
+    """3D Biplot with loading vectors; optional cluster hue and PC labels via pve."""
     feature_cols = loadings.columns.tolist()
 
     # 1) compute or assume scores
