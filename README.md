@@ -318,7 +318,7 @@ cat data/processed/processed_data.csv \
   ```
 
  - `<variant>` = your processing variant (e.g. `std`, etc.)
-  
+
  - `algo_<algorithm>_init_<init>` *must* match the regex above
   
  -  **Clustering evaluation metric files** *must* end in `_calinski.csv` or `_davies.csv`
@@ -330,8 +330,8 @@ cat data/processed/processed_data.csv \
   ```
 
 - `<input_dir>` = subfolder under `data/` (e.g. `processed`)
-  
-- `--decimals` = round metric values (default 3 decimal places)
+
+- [flag] `--decimals` = round metric values (default 3 decimal places)
 
 #### **Example on how to use `benchmark` in bash:**
 
