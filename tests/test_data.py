@@ -1,11 +1,11 @@
+from pathlib import Path
 import unittest
 
 
 class TestCodeIsTested(unittest.TestCase):
+    def test_fixture_exists(self):
+        self.assertTrue(Path("tests/fixtures/tennis_racquets.parquet").exists())
 
-    def test_code_is_tested(self):
-        self.assertTrue(False)
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

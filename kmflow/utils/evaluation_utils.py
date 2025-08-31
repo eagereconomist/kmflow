@@ -9,6 +9,10 @@ import re
 
 
 def load_metric_results(processed_root: Path, metric: str) -> pd.DataFrame:
+    """
+    Load metric CSVs (e.g. silhouette, calinski) from nested processed directories into
+    a DataFrame.
+    """
     records = []
 
     for variant_dir in processed_root.iterdir():
@@ -50,10 +54,16 @@ def load_metric_results(processed_root: Path, metric: str) -> pd.DataFrame:
 
 
 def load_calinski_results(processed_root: Path) -> pd.DataFrame:
+    """
+    Shortcut to load Calinski-Harabasz scores using `load_metric_results()`.
+    """
     return load_metric_results(processed_root, "calinski")
 
 
 def load_davies_results(processed_root: Path) -> pd.DataFrame:
+    """
+    Shortcut to load Davies-Bouldin scores using `load_metric_results()`.
+    """
     return load_metric_results(processed_root, "davies")
 
 
@@ -61,6 +71,9 @@ def merge_benchmarks(
     calinski_df: pd.DataFrame,
     davies_df: pd.DataFrame,
 ) -> pd.DataFrame:
+    """
+    Merge Calinski-Harabasz and Davies-Bouldin score DataFrames on shared metadata.
+    """
     calinski = calinski_df.rename(columns={"input_stem": "stem_calinski"})
     davies = davies_df.rename(columns={"input_stem": "stem_davies"})
 
@@ -100,6 +113,9 @@ def compute_inertia_scores(
     random_state: int = 4572,
     algorithm: str = "lloyd",
 ) -> pd.DataFrame:
+    """
+    Compute intertia values for a range of cluster counts using KMeans.
+    """
     X = (
         df.select_dtypes(include=np.number).values
         if numeric_cols is None
@@ -133,6 +149,8 @@ def compute_silhouette_scores(
     algorithm: str = "lloyd",
     k_values: Optional[Iterable[int]] = None,
 ) -> pd.DataFrame:
+    """
+    Compute silhouette scores across a range of cluster counts."""
     X = (
         df.select_dtypes(include=np.number).values
         if numeric_cols is None
@@ -160,6 +178,9 @@ def compute_calinski_scores(
     algorithm: str = "lloyd",
     k_values: Optional[Iterable[int]] = None,
 ) -> pd.DataFrame:
+    """
+    Compute Calinski-Harabasz scores for differnet cluster sizes.
+    """
     X = (
         df.select_dtypes(include=np.number).values
         if numeric_cols is None
@@ -191,6 +212,9 @@ def compute_davies_scores(
     algorithm: str = "lloyd",
     k_values: Optional[Iterable[int]] = None,
 ) -> pd.DataFrame:
+    """
+    Compute Davies-Bouldin scores for different cluster sizes.
+    """
     X = (
         df.select_dtypes(include=np.number).values
         if numeric_cols is None

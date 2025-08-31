@@ -1,131 +1,91 @@
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Optional
 
 import typer
+from loguru import logger
+from tqdm import tqdm
 
+import kmflow.utils.cli_utils as cli_utils
 import kmflow.utils.process_utils as process_utils
-import kmflow.config as config
 
-app = typer.Typer(help="Apply individual scaler to a preprocessed CSV.")
+app = typer.Typer(help="Apply a single scaler/transform to a CSV (stdin -> stdout).")
 
 
 @app.command("norm")
 def normalize(
-    input_file: Path = typer.Argument(..., help="CSV to read (use '-' to read from stdin)."),
-    output_file: Path = typer.Option(
-        config.PROCESSED_DATA_DIR,
-        "--output-file",
-        "-o",
-        help="Where to save normalized CSV; use '-' for stdout. Defaults to processed directory.",
+    input_path: Optional[Path] = typer.Option(
+        None, "--input", "-i", help="CSV path; omit to read stdin."
     ),
 ):
-    """L2-normalize all numeric columns."""
-    process_utils._run_scaler_with_progress(
-        process_utils.apply_normalizer,
-        input_file,
-        output_file,
-        "norm",
-        desc="Applying Normalize Scaler to Data",
-    )
+    with tqdm(total=2, desc="Applying Normalize Scaler to Data", colour="green") as pbar:
+        df = cli_utils.read_df(input_path)
+        pbar.update(1)
+        out_df = process_utils.apply_normalizer(df)
+        pbar.update(1)
+    cli_utils.write_df(out_df)
+    logger.success("Normalize CSV written to stdout.")
 
 
 @app.command("std")
 def standardize(
-    input_file: Path = typer.Argument(
-        ...,
-        help="CSV to read (use '-' to read from stdin).",
-    ),
-    output_file: Path = typer.Option(
-        config.PROCESSED_DATA_DIR,
-        "--output-file",
-        "-o",
-        help="Where to save standardized CSV; use '-' for stdout. Defaults to processed directory.",
+    input_path: Optional[Path] = typer.Option(
+        None, "--input", "-i", help="CSV path; omit to read stdin."
     ),
 ):
-    """
-    Z-score standardize all numeric columns.
-    """
-    process_utils._run_scaler_with_progress(
-        process_utils.apply_standardization,
-        input_file,
-        output_file,
-        "std",
-        desc="Applying Standardize Scaler to Data",
-    )
+    with tqdm(total=2, desc="Applying Standardize Scaler to Data", colour="green") as pbar:
+        df = cli_utils.read_df(input_path)
+        pbar.update(1)
+        out_df = process_utils.apply_standardization(df)
+        pbar.update(1)
+    cli_utils.write_df(out_df)
+    logger.success("Standardize CSV written to stdout.")
 
 
 @app.command("minmax")
 def minmax(
-    input_file: Path = typer.Argument(
-        ...,
-        help="CSV to read (use '-' to read from stdin).",
-    ),
-    output_file: Path = typer.Option(
-        config.PROCESSED_DATA_DIR,
-        "--output-file",
-        "-o",
-        help="Where to save min-max scaled CSV; use '-' for stdout. Defaults to processed directory.",
+    input_path: Optional[Path] = typer.Option(
+        None, "--input", "-i", help="CSV path; omit to read stdin."
     ),
 ):
-    """
-    Scale all numeric columns to [0,1].
-    """
-    process_utils._run_scaler_with_progress(
-        process_utils.apply_minmax,
-        input_file,
-        output_file,
-        "minmax",
-        desc="Applying MinMax Scaler to Data",
-    )
+    with tqdm(total=2, desc="Applying MinMax Scaler to Data", colour="green") as pbar:
+        df = cli_utils.read_df(input_path)
+        pbar.update(1)
+        out_df = process_utils.apply_minmax(df)
+        pbar.update(1)
+    cli_utils.write_df(out_df)
+    logger.success("MinMax CSV written to stdout.")
 
 
 @app.command("log1p")
 def log_scale(
-    input_file: Path = typer.Argument(
-        ...,
-        help="CSV to read (use '-' to read from stdin).",
-    ),
-    output_file: Path = typer.Option(
-        config.PROCESSED_DATA_DIR,
-        "--output-file",
-        "-o",
-        help="Where to save log1p-transformed CSV; use '-' for stdout. Defaults to processed directory.",
+    input_path: Optional[Path] = typer.Option(
+        None, "--input", "-i", help="CSV path; omit to read stdin."
     ),
 ):
-    """
-    Apply log(1 + x) transform to all numeric columns.
-    """
-    process_utils._run_scaler_with_progress(
-        process_utils.apply_log1p,
-        input_file,
-        output_file,
-        "log1p",
-        desc="Applying log(1 + x) Scaler to Data",
-    )
+    with tqdm(total=2, desc="Applying log(1 + x) Scaler to Data", colour="green") as pbar:
+        df = cli_utils.read_df(input_path)
+        pbar.update(1)
+        out_df = process_utils.apply_log1p(df)
+        pbar.update(1)
+    cli_utils.write_df(out_df)
+    logger.success("log1p CSV written to stdout.")
 
 
 @app.command("yj")
 def yeo_johnson_scale(
-    input_file: Path = typer.Argument(
-        ...,
-        help="CSV to read (use '-' to read from stdin).",
-    ),
-    output_file: Path = typer.Option(
-        config.PROCESSED_DATA_DIR,
-        "--output-file",
-        "-o",
-        help="Where to save Yeo-Johnson transformed CSV; use '-' for stdout. Defaults to processed directory.",
+    input_path: Optional[Path] = typer.Option(
+        None, "--input", "-i", help="CSV path; omit to read stdin."
     ),
 ):
-    """
-    Apply Yeo-Johnson transform to all numeric columns.
-    """
-    process_utils._run_scaler_with_progress(
-        process_utils.apply_yeo_johnson,
-        input_file,
-        output_file,
-        "yj",
-        desc="Applying Yeo-Johnson Scaler to Data",
-    )
+    with tqdm(total=2, desc="Applying Yeo-Johnson Scaler to Data", colour="green") as pbar:
+        df = cli_utils.read_df(input_path)
+        pbar.update(1)
+        out_df = process_utils.apply_yeo_johnson(df)
+        pbar.update(1)
+    cli_utils.write_df(out_df)
+    logger.success("Yeo-Johnson CSV written to stdout.")
 
 
 if __name__ == "__main__":
