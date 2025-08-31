@@ -28,7 +28,7 @@ Key features:
 
    ```bash
    # Create venv
-   $ python -m venv .venv
+   python -m venv .venv
 
    # Activate
    source .venv/bin/activate    # macOS / Linux
