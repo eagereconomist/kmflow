@@ -18,7 +18,7 @@ def fit_kmeans(
     Fit K-Means on the numeric columns the user passed (or all numeric if none),
     but still carry through any non-numeric columns passed into the output.
     """
-    # ─── split out what the user asked for ──────────────────────────────────
+    # split out what the user asked for
     if numeric_cols:
         requested = list(numeric_cols)
         numeric_feats = [col for col in requested if pd.api.types.is_numeric_dtype(df[col])]
@@ -27,7 +27,7 @@ def fit_kmeans(
         numeric_feats = df.select_dtypes(include=np.number).columns.tolist()
         passthrough_feats = []
 
-    # ─── build the matrix only from the numeric features ────────────────
+    # build the matrix only from the numeric features
     X = df[numeric_feats].values
 
     km = KMeans(
@@ -39,7 +39,7 @@ def fit_kmeans(
     )
     labels = km.fit_predict(X)
 
-    # ─── assemble output: requested string cols + numeric inputs + cluster ──
+    # assemble output: requested string cols + numeric inputs + cluster
     output_cols = passthrough_feats + numeric_feats
     df_km_labels = df[output_cols].copy()
     df_km_labels[f"{cluster_col}_{k}"] = labels
@@ -61,7 +61,7 @@ def batch_kmeans(
     Run K-Means for each k in k_range on the numeric columns the user passed (or all numeric if none),
     but carry through any non-numeric columns too.
     """
-    # ─── split requested columns into numeric vs passthrough ─────────────
+    # split requested columns into numeric vs passthrough
     if numeric_cols:
         requested = list(numeric_cols)
         numeric_feats = [col for col in requested if pd.api.types.is_numeric_dtype(df[col])]
@@ -70,21 +70,21 @@ def batch_kmeans(
         numeric_feats = df.select_dtypes(include=np.number).columns.tolist()
         passthrough_feats = []
 
-    # ─── build X from numeric features only ───────────────────────────────
+    # build X from numeric features only
     X = df[numeric_feats].values
 
-    # ─── expand k_range into an iterable of ints ─────────────────────────
+    # expand k_range into an iterable of ints
     if isinstance(k_range, tuple):
         k_start, k_end = k_range
         ks = range(k_start, k_end + 1)
     else:
         ks = k_range
 
-    # ─── prepare output DataFrame with only requested cols ────────────────
+    # prepare output DataFrame with only requested cols
     output_cols = passthrough_feats + numeric_feats
     df_labeled = df[output_cols].copy()
 
-    # ─── loop over each k, fit & label ─────────────────────────────────
+    # loop over each k, fit & label
     for k in ks:
         algo_option = algorithm if k > 1 else "lloyd"
         km = KMeans(
